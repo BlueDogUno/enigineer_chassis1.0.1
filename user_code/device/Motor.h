@@ -25,6 +25,9 @@ public:
     fp32 max_angle;
     fp32 min_angle;
 
+    fp32 max_speed;
+    fp32 min_speed;
+
     fp32 current_set;
     int16_t current_give;
 

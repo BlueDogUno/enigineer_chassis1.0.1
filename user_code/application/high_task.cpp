@@ -15,7 +15,7 @@ void high_task(void *pvParameters)
     //空闲一段时间
     vTaskDelay(HIGH_TASK_INIT_TIME);
     high.init();
-
+    high.save_init();
 
     while(true) 
     { 
@@ -33,6 +33,11 @@ void high_task(void *pvParameters)
 
         //电流输出
         high.output();
+
+        high.save_rc_control();
+
+        high.save_control_send();
+
         //系统延时
         vTaskDelay(HIGH_TASK_INIT_TIME);
     }

@@ -19,15 +19,10 @@ enum motive_chassis_motor_id_e
   MOTIVE_FL_MOTOR,
   MOTIVE_BL_MOTOR,
   MOTIVE_BR_MOTOR,
-};
 
-enum high_motor_id_e
-{
   //抬升电机数据接收
   LIFT_LEFT_MOTOR = 0,
   LIFT_RIGHT_MOTOR,
-  STRETCH_LEFT_MOTOR,
-  STRETCH_RIGHT_MOTOR,
 };
 
 /* CAN send and receive ID */
@@ -43,8 +38,6 @@ typedef enum
   //抬升电机ID CAN2
   CAN_HIGH_LEFT_MOTOR_ID = 0x205,
   CAN_HIGH_RIGHT_MOTOR_ID = 0x206,
-  CAN_STRETCH_LEFT_MOTOR_ID = 0x207,
-  CAN_STRETCH_RIGHT_MOTOR_ID = 0x208,
 
   
   CAN_CHASSIS_HIGH_ALL_ID = 0x1FF,
@@ -188,7 +181,7 @@ public:
 
   const motor_measure_t *get_chassis_high_motor_measure_point(uint8_t i);
 
-  void can_cmd_chassis_high_motor(int16_t motor1, int16_t motor2 , int16_t motor3 , int16_t motor4);
+  void can_cmd_chassis_high_motor(int16_t motor1, int16_t motor2);
 
   void get_high_motor_measure(uint8_t num, uint8_t data[8]);
 };
