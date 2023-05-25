@@ -120,18 +120,19 @@ void TOP::lift_set_mode()
         //遥控器控制
         if(right_switch_is_down)//右拨杆向下     
         {
-            if (left_rocker_up)
-            {
-                top.lift_state = up;
-            }
-            else if(left_rocker_down)
-            {
-                top.lift_state = down;
-            }
-            else
-            {
-                top.lift_state = stop;
-            }
+            // if (left_rocker_up)
+            // {
+            //     top.lift_state = up;
+            // }
+            // else if(left_rocker_down)
+            // {
+            //     top.lift_state = down;
+            // }
+            // else
+            // {
+            //     top.lift_state = stop;
+            // }
+            top.lift_state = hand;
         }else if(KEY_TOP_Z){ //键盘控制
             if (top_RC->mouse.y < 0)
             {
@@ -163,61 +164,39 @@ void TOP::lift_set_mode()
 
 void TOP::lift_control()
 {   
-    // strt.can.lift.left_speed    = strt.motor_measure[0]->speed_rpm;
-    // strt.can.lift.right_speed   = strt.motor_measure[1]->speed_rpm;
 
-    // strt.can.lift.left  = 0;
-    // strt.can.lift.right = 0;
-
+    fp32 vx_set = 0;
     chassis_high_motor[0].speed_set = 0;
     chassis_high_motor[1].speed_set = 0;
     //改变chassis_high_motor[i].speed_set的值
-    if (state_is_stop)
-    {
-        // strt.can.lift.left_target   =   -13 * 19;
-        // strt.can.lift.right_target  =   13 * 19;
-        chassis_high_motor[0].speed_set = 0;
-        chassis_high_motor[1].speed_set = 0;
-    }
-    if (state_is_up)
-    {
-        // strt.can.lift.left_target   =   -60 * 19;
-        // strt.can.lift.right_target  =   60 * 19;
-        chassis_high_motor[0].speed_set = -100;
-        chassis_high_motor[1].speed_set = 100;
+    // if (state_is_stop)
+    // {
+    //     // strt.can.lift.left_target   =   -13 * 19;
+    //     // strt.can.lift.right_target  =   13 * 19;
+    //     chassis_high_motor[0].speed_set = 0;
+    //     chassis_high_motor[1].speed_set = 0;
+    // }
+    // if (state_is_up)
+    // {
+    //     // strt.can.lift.left_target   =   -60 * 19;
+    //     // strt.can.lift.right_target  =   60 * 19;
+    //     chassis_high_motor[0].speed_set = -100;
+    //     chassis_high_motor[1].speed_set = 100;
+    // }
+
+    // if (state_is_down)
+    // {
+    //     // strt.can.lift.left_target   =   10*19;//40 * 19;
+    //     // strt.can.lift.right_target  =   -10*19;//-40 * 19;
+    //     chassis_high_motor[0].speed_set = 100;
+    //     chassis_high_motor[1].speed_set = -100;
+    // }
+    if(top.lift_state == hand){
+        vx_set = top_RC->rc.ch[3] / 10;
+        chassis_high_motor[0].speed_set = vx_set;
+        chassis_high_motor[1].speed_set = -1*vx_set;
     }
 
-    if (state_is_down)
-    {
-        // strt.can.lift.left_target   =   10*19;//40 * 19;
-        // strt.can.lift.right_target  =   -10*19;//-40 * 19;
-        chassis_high_motor[0].speed_set = 100;
-        chassis_high_motor[1].speed_set = -100;
-    }
-    // if(auto_behave->target_mode == 1 && lift_keyboard == 1/*&& strt.auto_behave->a_takein_mode == 0*/ ) //自动模式
-    // {
-    //     if(lift_lenth - auto_behave->a_lift_target > 5.0f)
-    //     {
-    //         // strt.can.lift.left_target   =   -60 * 19;
-    //         // strt.can.lift.right_target  =   60 * 19;
-    //         chassis_high_motor[0].speed_set = -60 * 19;
-    //         chassis_high_motor[1].speed_set = 60 * 19;
-    //     }
-    //     if(lift_lenth - auto_behave->a_lift_target < -5.0f)
-    //     {
-    //         // strt.can.lift.left_target   =   10*19;
-    //         // strt.can.lift.right_target  =   -10*19;
-    //         chassis_high_motor[0].speed_set = 10*19;
-    //         chassis_high_motor[1].speed_set = -10*19;
-    //     }
-    //     if(lift_lenth - auto_behave->a_lift_target < 5.0f && lift_lenth - auto_behave->a_lift_target > -5.0f)
-    //     {
-    //         // strt.can.lift.left_target   =   -13 * 19;
-    //         // strt.can.lift.right_target  =   13 * 19;
-    //         chassis_high_motor[0].speed_set = -13 * 19;
-    //         chassis_high_motor[1].speed_set = 13 * 19;
-    //     }
-    // }
     for (int i = 0; i < 2; i++)
     {
         //计算抬升电机的输出电流
@@ -227,15 +206,6 @@ void TOP::lift_control()
 
 
 
-// 自动模式使用位置环和速度环来控制  ？
-// void lift_auto_control(void)
-// {
-//     strt.can.lift.left_target = (int16_t)lift_PID_calc(&lift_PID[4],(int16_t)strt.lift_lenth,(int16_t)strt.auto_behave->a_lift_target);
-//     strt.can.lift.right_target = -1*strt.can.lift.left_target;
-    
-//     strt.can.lift.left = (int16_t)lift_PID_calc(&lift_PID[0],strt.can.lift.left_speed,strt.can.lift.left_target);
-//     strt.can.lift.right = (int16_t)lift_PID_calc(&lift_PID[1],strt.can.lift.right_speed,strt.can.lift.right_target);
-// }
 
 void TOP::output()
 {

@@ -150,6 +150,7 @@ extern enum
     down,
     in,
     out,
+    hand,
 }state_type;
 
  //任务流程
