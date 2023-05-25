@@ -129,15 +129,22 @@ extern "C"
 
             //底盘抬升电机
             case CAN_HIGH_LEFT_MOTOR_ID:
-                can_receive.get_high_motor_measure(HIGH_LEFT_MOTOR, rx_data);
+                can_receive.get_high_motor_measure(LIFT_LEFT_MOTOR, rx_data);
                 //detect_hook(CHASSIS_RUDDER_FR_MOTOR_TOE);
                 break;
             
             case CAN_HIGH_RIGHT_MOTOR_ID:
-                can_receive.get_high_motor_measure(HIGH_RIGHT_MOTOR, rx_data);
+                can_receive.get_high_motor_measure(LIFT_RIGHT_MOTOR, rx_data);
                 //detect_hook(CHASSIS_RUDDER_FL_MOTOR_TOE);
                 break;
-
+            case CAN_STRETCH_LEFT_MOTOR_ID:
+                can_receive.get_high_motor_measure(STRETCH_LEFT_MOTOR, rx_data);
+                //detect_hook(CHASSIS_RUDDER_FL_MOTOR_TOE);
+                break;
+            case CAN_STRETCH_RIGHT_MOTOR_ID:
+                can_receive.get_high_motor_measure(STRETCH_RIGHT_MOTOR, rx_data);
+                //detect_hook(CHASSIS_RUDDER_FL_MOTOR_TOE);
+                break;
             default:
             {
                 break;

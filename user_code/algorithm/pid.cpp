@@ -64,7 +64,7 @@ fp32 Pid::pid_calc()
         *data.error_delta = data.error - data.last_error;
 
     if (mode == PID_ANGLE)
-        data.error = rad_format(data.error);
+        *data.error_delta = data.error - data.last_error;
 
     data.Pout = data.Kp * data.error;
     data.Iout += data.Ki * data.error;

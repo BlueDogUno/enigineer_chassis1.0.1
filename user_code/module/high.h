@@ -1,173 +1,160 @@
 #ifndef HIGH_H
-#define  HIGH_H
+#define HIGH_H
 
-#include "remote_control.h"
-#include "can.h"
-#include "CAN_receive.h"
+#include "system_config.h"
+
 #include "struct_typedef.h"
+#include "First_order_filter.h"
+#include "Remote_control.h"
 #include "Motor.h"
+#include "Pid.h"
+#include "Config.h"
 
-//遥控器状态命名
-    #define left_switch_is_up           (top_RC->rc.s[0] == 1)
-    #define left_switch_is_mid          (top_RC->rc.s[0] == 3)
-    #define left_switch_is_down         (top_RC->rc.s[0] == 2)
-    #define right_switch_is_up          (top_RC->rc.s[1] == 1)
-    #define right_switch_is_mid         (top_RC->rc.s[1] == 3)
-    #define right_switch_is_down        (top_RC->rc.s[1] == 2)
+//抬升电机方向
+#define HIGH_UPLOAD_MOTOR_TURN 1
+//伸爪电机方向
+#define HIGH_STRETCH_MOTOR_TURN 1
 
-    #define left_rocker_up              (top_RC->rc.ch[3] > 0)
-    #define left_rocker_down            (top_RC->rc.ch[3] < 0)
-    #define left_rocker_mid             (top_RC->rc.ch[3] == 0)
+//任务控制间隔 2ms
+#define HIGH_CONTROL_TIME_MS 2
 
-    #define right_rocker_up              (top_RC->rc.ch[1] > 0)
-    #define right_rocker_down            (top_RC->rc.ch[1] < 0)
-    #define right_rocker_mid             (top_RC->rc.ch[1] == 0)
+//前后的遥控器通道号码
+#define HIGH_X_CHANNEL 3
+//左右的遥控器通道号码
+#define HIGH_Y_CHANNEL 2
 
-    //电机状态命名
-    #define state_is_stop               (top.lift_state == stop)
-    #define state_is_up                 (top.lift_state == up)
-    #define state_is_down               (top.lift_state == down)
-    
-    //m3508转化成抬升速度(m/s)的比例，
-    #define M3508_MOTOR_RPM_TO_VECTOR 0.000415809748903494517209f
-    #define CHASSIS_HIGH_RPM_TO_VECTOR_SEN M3508_MOTOR_RPM_TO_VECTOR
+#define HIGH_OPEN_RC_SCALE 10 // 遥控器乘以该比例发送到can上
 
-//键盘状态
-#define KEY_TOP_Z           if_key_pessed(top_RC, 'Z')
+//选择取矿机构状态 开关通道号
+#define HIGH_MODE_CHANNEL 1
+//选择取矿机构状态 开关通道号
+#define STRETCH_MODE_CHANNEL 0
 
-/*typedef struct 
+//抬升电机速度环PID
+#define MOTIVE_MOTOR_SPEED_PID_KP 1000.0f
+#define MOTIVE_MOTOR_SPEED_PID_KI 0.0f
+#define MOTIVE_MOTOR_SPEED_PID_KD 0.1f
+#define MOTIVE_MOTOR_SPEED_PID_MAX_IOUT 2.0f
+#define MOTIVE_MOTOR_SPEED_PID_MAX_OUT 6000.0f
+
+//抬升电机角度环PID
+#define MOTIVE_MOTOR_ANGLE_PID_KP 100.0f 
+#define MOTIVE_MOTOR_ANGLE_PID_KI 0.0f
+#define MOTIVE_MOTOR_ANGLE_PID_KD 1.0f
+#define MOTIVE_MOTOR_ANGLE_PID_MAX_IOUT 1.0f
+#define MOTIVE_MOTOR_ANGLE_PID_MAX_OUT 6000.0f
+
+
+//m3508转化成底盘速度(m/s)的比例，
+#define M3508_MOTOR_RPM_TO_VECTOR 0.000415809748903494517209f
+#define HIGH_MOTOR_RPM_TO_VECTOR_SEN M3508_MOTOR_RPM_TO_VECTOR
+#define HIGH_MOTOR_RPM_TO_VECTOR_SEN M3508_MOTOR_RPM_TO_VECTOR
+
+#define MOTOR_SPEED_TO_HIGH_SPEED 0.25f
+
+// 伸爪电机角度限幅
+#define STRENTCH_LIMIT_ANGLE 0.0f
+
+//抬升过程最大速度
+#define NORMAL_MAX_HIGH_SPEED 4.0f //2.0
+//伸爪最大速度
+#define NORMAL_MAX_STRETCH_SPEED 4.0f //2.0
+//遥控器输入死区，因为遥控器存在差异，摇杆在中间，其值不一定为零
+
+#define ANGLE_ERR_TOLERANT 2000
+#define RC_DEADBAND 0
+
+#define rc_deadband_limit(input, output, dealine)        \
+    {                                                    \
+        if ((input) > (dealine) || (input) < -(dealine)) \
+        {                                                \
+            (output) = (input);                          \
+        }                                                \
+        else                                             \
+        {                                                \
+            (output) = 0;                                \
+        }                                                \
+    }
+
+typedef enum
 {
-    const RC_ctrl_t *rc_data;
-    const motor_measure_t *motor[9];
+    HIGH_STRETCH_L_ID = 0,
+    HIGH_STRETCH_R_ID,
+    HIGH_LIFT_LEFT_ID,
+    HIGH_LIFT_RIGHT_ID,
+};                    
 
-    int16_t auto_mode;
-    int16_t target_mode;
-    int16_t press_flag;
-    int16_t last_press_flag;
-    //int16_t photogate_1;
-    float flip_reset_angle;
-    int16_t flip_reset_flag;
-    int16_t flip_reset_last_flag;
-    //0为停，1为上，2为下
-    int16_t a_catch_mode;
-    int16_t a_takein_mode;
-    int16_t a_takeout_mode;
-    int16_t a_push_mode;
-    int16_t a_exchange_mode;
-
-    int16_t a_push_flag;
-    int16_t a_takein_flag;
-
-    float a_lift_target;
-    float a_stretch_target;
-    int16_t a_flip_target;
-    int16_t a_catch_target;
-
-    int16_t arrive;
-
-    float   a_flip_angle;
-    float   a_lift_angle;
-    float   a_stretch_angle;
-
-
-    float a_lift_down;
-    float a_lift_up;
-    float a_stretch_out;
-    float a_stretch_back;
-    float a_flip_up;
-    float a_flip_down;
-
-}auto_t;
-*/
-
-typedef struct 
+typedef enum
 {
-    int16_t Reset_key;
-    int16_t Reset_last_key;
-    int16_t Reset_flag;
-    int16_t Reset_last_flag;
-}reset_t;
-
-class TOP{
-public:
-    const RC_ctrl_t *top_RC; //底盘使用的遥控器指针
-    RC_ctrl_t *last_top_RC; //底盘使用的遥控器指针
-
-    uint16_t top_last_key_v;  //遥控器上次按键
-
-    
-    M3508_motor chassis_high_motor[2]; //抬升电机数据
-    
-    //抬升
-    
-    float lift_lenth;
-    // const auto_t *auto_behave;
-    int lift_state;
-    // const reset_t *reset_key;
-    int8_t save_data;
-
-
-    void init();
-    void feedback_update();
-
-    void save_task();
-
-    void lift_set_mode(void);
-    void lift_control(void);
-   
-    void output();
+    READY,
+    WAIT,
 };
 
-extern TOP top;
-
-//--------------------------------救援-----------------------------------------------
-
-//-----------------------------------------------------------------------------------
-//--------------------------------抬升-----------------------------------------------
-
-// 电控限位值
-#define lift_down  -10.0f
-#define lift_up  -520.0f
-
-//一号电机PID
-#define LIFT_LEFT_KP       20.0f
-#define LIFT_LEFT_KI      0.0f
-#define LIFT_LEFT_KD      200.0f
-#define LIFT_LEFT_MAX_OUT      16000.0f
-#define LIFT_LEFT_MAX_IOUT    1.0f
-//二号电机PID
-#define LIFT_RIGHT_KP       20.0f
-#define LIFT_RIGHT_KI       0.0f
-#define LIFT_RIGHT_KD       200.0f
-#define LIFT_RIGHT_MAX_OUT     16000.0f
-#define LIFT_RIGHT_MAX_IOUT     1.0f
-
-// 各种档位的赋值，方便模式设置
-extern enum
+typedef enum
 {
-    stop    =   0,
-    up,
-    down,
-    in,
-    out,
-    hand,
-}state_type;
+    HIGH_ZERO_FORCE,                  //无力,电机电流控制值为0,应用于遥控器掉线或者需要底盘上电时方便推动的场合
 
- //任务流程
+    HIGH_OPEN,                        //遥控器的通道值直接转化成电机电流值发送到can总线上
+
+    HIGH_CLOSE,                       //全自动，操作手没有权限控制
+
+} high_behaviour_e;                   //抬升机构部分行为模式
+
+typedef enum
+{
+    HIGH_AUTO,      //无敌的自动模式
+
+    HIGH_HAND,      //用了自动模式的都说好
+
+} high_mode_e;      //控制模式
+
+
+class High {
+public:
+    const RC_ctrl_t *high_RC; //底盘使用的遥控器指针
+    RC_ctrl_t *last_high_RC; //底盘使用的遥控器指针
+
+    uint16_t high_last_key_v;  //遥控器上次按键
+
+    high_behaviour_e high_behaviour_mode; //底盘行为状态机
+    high_behaviour_e last_high_behaviour_mode; //底盘上次行为状态机
+
+    high_mode_e high_mode; //底盘控制状态机
+    high_mode_e last_high_mode; //底盘上次控制状态机
+
+    M3508_motor high_motive_motor[4];
+    int32_t stretch_moto_start_angle[2];
+
+    int8_t motor_status[2];
+    
+    
+
+    void init();
+
+    void set_mode();
+
+    void behaviour_mode_set();
+    
     void feedback_update();
 
-    //救援电机控制
-    void save_task();
+    void set_control();
 
-    //抬升模式改变
-    void lift_set_mode();
+    //行为模式
+    void behaviour_control_set(fp32 *vx_set, fp32 *vy_set);
 
-    //抬升赋值
-   void lift_control();
+    void high_open_set_control(fp32 *vx_set, fp32 *vy_set);
 
-    //电流输出
+    void motor_set_control(M3508_motor *motor);
+
+    void solve();
+
     void output();
 
+    void motor_angle_limit(M3508_motor *motor);
+};
 
-//-----------------------------------------------------------------------------------
+
+extern High high;
+
+
 #endif

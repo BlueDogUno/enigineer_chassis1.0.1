@@ -40,6 +40,8 @@ void Can_receive::get_high_motor_measure(uint8_t num, uint8_t data[8])
     {
         chassis_high_motor[num].round++;
     }
+    chassis_high_motor[num].total_angle = chassis_high_motor[num].round * 8192 + chassis_high_motor[num].ecd - chassis_high_motor[num].offset_angle;
+    chassis_high_motor[num].angle_err = chassis_high_motor[num].last_total_angle - chassis_high_motor[num].total_angle;
 
 }
 
@@ -70,7 +72,7 @@ void Can_receive::can_cmd_chassis_motive_motor(int16_t motor1, int16_t motor2, i
     HAL_CAN_AddTxMessage(&CHASSIS_CAN, &chassis_tx_message, chassis_can_send_data, &send_mail_box);
 }
 
-void Can_receive::can_cmd_chassis_high_motor(int16_t motor1, int16_t motor2)
+void Can_receive::can_cmd_chassis_high_motor(int16_t motor1, int16_t motor2,int16_t motor3, int16_t motor4)
 {
     uint32_t send_mail_box;
     chassis_tx_message.StdId = CAN_CHASSIS_HIGH_ALL_ID;
@@ -81,10 +83,10 @@ void Can_receive::can_cmd_chassis_high_motor(int16_t motor1, int16_t motor2)
     chassis_can_send_data[1] = motor1;
     chassis_can_send_data[2] = motor2 >> 8;
     chassis_can_send_data[3] = motor2;
-    chassis_can_send_data[4] = 0;
-    chassis_can_send_data[5] = 0;
-    chassis_can_send_data[6] = 0;
-    chassis_can_send_data[7] = 0;
+    chassis_can_send_data[4] = motor3 >> 8;
+    chassis_can_send_data[5] = motor3;
+    chassis_can_send_data[6] = motor4 >> 8;
+    chassis_can_send_data[7] = motor4;
 
     HAL_CAN_AddTxMessage(&CHASSIS_CAN, &chassis_tx_message, chassis_can_send_data, &send_mail_box);
 }

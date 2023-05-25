@@ -1,45 +1,40 @@
 #include "high_task.h"
 
-#include "system_config.h"
+#include "system_config.h" 
 
 #include "high.h"
-
-
+#include "Communicate.h"
 
 /**
-  * @brief          chassis_task
+  * @brief          high_task
   * @param[in]      pvParameters: NULL
   * @retval         none
   */
 void high_task(void *pvParameters) 
 {
+    //空闲一段时间
+    vTaskDelay(HIGH_TASK_INIT_TIME);
+    high.init();
 
 
+    while(true) 
+    { 
+        //设置模式
+        high.set_mode();
 
-  //空闲一段时间
-  //vTaskDelay(HIGH_TASK_INIT_TIME);
-  top.init();
+        //反馈数据
+        high.feedback_update();
 
-  while (true)
-  {
+        //设置控制量
+        high.set_control();
 
-    //反馈数据
-    top.feedback_update();
+        //解算
+        high.solve();
 
-    //救援电机控制
-    top.save_task();
-
-    //抬升模式改变
-    top.lift_set_mode();
-
-    //抬升赋值
-    top.lift_control();
-
-    //电流输出
-    top.output();
-
-    //系统延时
-    vTaskDelay(HIGH_CONTROL_TIME_MS);
-  }
-  
+        //电流输出
+        high.output();
+        //系统延时
+        vTaskDelay(HIGH_TASK_INIT_TIME);
+    }
 }
+

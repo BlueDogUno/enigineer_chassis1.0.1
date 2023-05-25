@@ -19,9 +19,15 @@ enum motive_chassis_motor_id_e
   MOTIVE_FL_MOTOR,
   MOTIVE_BL_MOTOR,
   MOTIVE_BR_MOTOR,
+};
+
+enum high_motor_id_e
+{
   //抬升电机数据接收
-  HIGH_LEFT_MOTOR = 0,
-  HIGH_RIGHT_MOTOR = 1,
+  LIFT_LEFT_MOTOR = 0,
+  LIFT_RIGHT_MOTOR,
+  STRETCH_LEFT_MOTOR,
+  STRETCH_RIGHT_MOTOR,
 };
 
 /* CAN send and receive ID */
@@ -37,6 +43,9 @@ typedef enum
   //抬升电机ID CAN2
   CAN_HIGH_LEFT_MOTOR_ID = 0x205,
   CAN_HIGH_RIGHT_MOTOR_ID = 0x206,
+  CAN_STRETCH_LEFT_MOTOR_ID = 0x207,
+  CAN_STRETCH_RIGHT_MOTOR_ID = 0x208,
+
   
   CAN_CHASSIS_HIGH_ALL_ID = 0x1FF,
 
@@ -61,6 +70,12 @@ typedef struct
   uint8_t temperate;
   int16_t last_ecd;
   int16_t round;
+
+  fp32 total_angle;
+  fp32 offset_angle;
+  fp32 last_total_angle;
+  fp32 angle_err;
+
 } motor_measure_t;
 
 // TODO 超电还未对接
@@ -127,7 +142,7 @@ class Can_receive
 public:
   //动力电机反馈数据结构体
   motor_measure_t chassis_motive_motor[4];
-  motor_measure_t chassis_high_motor[2];
+  motor_measure_t chassis_high_motor[4];
 
   //发送数据结构体
   CAN_TxHeaderTypeDef chassis_tx_message;
@@ -173,7 +188,7 @@ public:
 
   const motor_measure_t *get_chassis_high_motor_measure_point(uint8_t i);
 
-  void can_cmd_chassis_high_motor(int16_t motor1, int16_t motor2);
+  void can_cmd_chassis_high_motor(int16_t motor1, int16_t motor2 , int16_t motor3 , int16_t motor4);
 
   void get_high_motor_measure(uint8_t num, uint8_t data[8]);
 };
