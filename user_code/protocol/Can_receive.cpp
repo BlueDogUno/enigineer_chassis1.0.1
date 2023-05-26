@@ -138,90 +138,30 @@ void Can_receive::receive_rc_board_com(uint8_t data[8])
     chassis_receive.v = (uint16_t)(data[6] << 8 | data[7]);
 }
 
-void Can_receive::receive_gimbal_board_com(uint8_t data[8])
+void Can_receive::receive_ss_board_com(uint8_t data[8])
 {
-    chassis_receive.s1 = data[0];
-    chassis_receive.gimbal_behaviour = data[1];
-    chassis_receive.gimbal_yaw_angle = (fp32)(int32_t)(data[2] << 24 | data[3] << 16 | data[4] << 8 | data[5]) / 1000;
+    chassis_receive.s0 = data[0];
+    chassis_receive.s1 = data[1];
 }
+
 void Can_receive::receive_ui_board_com(uint8_t data[8])
 {
-    chassis_receive.auto_state = data[0];
-    chassis_receive.aim_state = data[1];
-    chassis_receive.fric_state = data[2];
-    chassis_receive.gimbal_pitch_angle = (fp32)(int16_t)(data[3] << 8 | data[4]);;
+    chassis_receive.stretch_state = data[0];
+    chassis_receive.yaw_state = data[1];
+    chassis_receive.roll_state = data[2];
+    chassis_receive.flip_state = data[3];
     chassis_receive.v = (uint16_t)(data[5] << 8 | data[6]);
 }
 
-void Can_receive::send_cooling_and_id_board_com(uint16_t id1_42mm_cooling_limit, uint16_t id1_42mm_cooling_rate, uint16_t id1_42mm_cooling_heat, uint8_t color, uint8_t robot_id)
-{
-    //数据填充
-    chassis_send.id1_42mm_cooling_limit = id1_42mm_cooling_limit;
-    chassis_send.id1_42mm_cooling_rate = id1_42mm_cooling_rate;
-    chassis_send.id1_42mm_cooling_heat = id1_42mm_cooling_heat;
-    chassis_send.color = color;
-    chassis_send.robot_id = robot_id;
-
+void Can_receive::send_lift_auto_state(bool_t lift_state){
+    
     uint32_t send_mail_box;
-    chassis_tx_message.StdId = CAN_COOLING_BOARM_COM_ID;
+    chassis_tx_message.StdId = CAN_SEND_LIFT_AUTO_COM_ID;
     chassis_tx_message.IDE = CAN_ID_STD;
     chassis_tx_message.RTR = CAN_RTR_DATA;
     chassis_tx_message.DLC = 0x08;
-    chassis_can_send_data[0] = id1_42mm_cooling_limit >> 8;
-    chassis_can_send_data[1] = id1_42mm_cooling_limit;
-    chassis_can_send_data[2] = id1_42mm_cooling_rate >> 8;
-    chassis_can_send_data[3] = id1_42mm_cooling_rate;
-    chassis_can_send_data[4] = id1_42mm_cooling_heat >> 8;
-    chassis_can_send_data[5] = id1_42mm_cooling_heat;
-    chassis_can_send_data[6] = color;
-    chassis_can_send_data[7] = robot_id;
-
-    HAL_CAN_AddTxMessage(&BOARD_COM_CAN, &chassis_tx_message, chassis_can_send_data, &send_mail_box);
-}
-
-void Can_receive::send_42mm_speed_and_mode_board_com(uint16_t id1_42mm_speed_limit, uint16_t bullet_speed, uint8_t chassis_behaviour,uint8_t game_progress)
-{
-    //数据填充
-    chassis_send.id1_42mm_speed_limi = id1_42mm_speed_limit;
-    chassis_send.bullet_speed = bullet_speed;
-    chassis_send.chassis_behaviour = chassis_behaviour;
-    chassis_send.game_progress = game_progress;
-
-    uint32_t send_mail_box;
-    chassis_tx_message.StdId = CAN_42MM_SPEED_BOARD_COM_ID;
-    chassis_tx_message.IDE = CAN_ID_STD;
-    chassis_tx_message.RTR = CAN_RTR_DATA;
-    chassis_tx_message.DLC = 0x08;
-    chassis_can_send_data[0] = id1_42mm_speed_limit >> 8;
-    chassis_can_send_data[1] = id1_42mm_speed_limit;
-    chassis_can_send_data[2] = bullet_speed >> 8;
-    chassis_can_send_data[3] = bullet_speed;
-    chassis_can_send_data[4] = chassis_behaviour;
-    chassis_can_send_data[5] = game_progress;
-    chassis_can_send_data[6] = 0;
-    chassis_can_send_data[7] = 0;
-
-    HAL_CAN_AddTxMessage(&BOARD_COM_CAN, &chassis_tx_message, chassis_can_send_data, &send_mail_box);
-}
-
-void Can_receive::get_super_cap_data(uint8_t data[8])
-{
-    cap_receive.input_vot = ((float)((int16_t)(data[1] << 8 | data[0])) / 100.0f);     //输入电压
-    cap_receive.cap_vot = ((float)((int16_t)(data[3] << 8 | data[2])) / 100.0f);       //电容电压
-    cap_receive.input_current = ((float)((int16_t)(data[5] << 8 | data[4])) / 100.0f); //输入电流
-    cap_receive.target_power = ((float)((int16_t)(data[7] << 8 | data[6])) / 100.0f);  //输入功率
-}
-
-void Can_receive::can_cmd_super_cap_power(uint16_t set_power)
-{
-    uint32_t send_mail_box;
-    chassis_tx_message.StdId = 0x210;
-    chassis_tx_message.IDE = CAN_ID_STD;   // 0x0000
-    chassis_tx_message.RTR = CAN_RTR_DATA; // 0x0000
-    chassis_tx_message.DLC = 0x08;
-
-    chassis_can_send_data[0] = (set_power >> 8);
-    chassis_can_send_data[1] = (set_power);
+    chassis_can_send_data[0] = lift_state;
+    chassis_can_send_data[1] = 0;
     chassis_can_send_data[2] = 0;
     chassis_can_send_data[3] = 0;
     chassis_can_send_data[4] = 0;
@@ -229,5 +169,5 @@ void Can_receive::can_cmd_super_cap_power(uint16_t set_power)
     chassis_can_send_data[6] = 0;
     chassis_can_send_data[7] = 0;
 
-    HAL_CAN_AddTxMessage(&CHASSIS_CAN, &chassis_tx_message, chassis_can_send_data, &send_mail_box);
+    HAL_CAN_AddTxMessage(&BOARD_COM_CAN, &chassis_tx_message, chassis_can_send_data, &send_mail_box);
 }

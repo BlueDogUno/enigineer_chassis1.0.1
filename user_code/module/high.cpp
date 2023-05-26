@@ -45,7 +45,7 @@ void High::init()
 {
     high_RC = remote_control.get_remote_control_point();
     last_high_RC = remote_control.get_last_remote_control_point();
-
+    lift_state = 0;
     for (uint8_t i = 0; i < 2; ++i)
     {
 
@@ -344,7 +344,11 @@ void High::motor_set_control(M3508_motor *motor)
 //================================================================
 
 void High::save_init(){
-    high.save_state = ONE;
+    	HAL_TIM_Base_Start(&htim1);
+	    HAL_TIM_Base_Start(&htim5);
+        HAL_TIM_PWM_Start(&htim1, TIM_CHANNEL_1);
+        HAL_TIM_PWM_Start(&htim1, TIM_CHANNEL_2);
+		HAL_TIM_PWM_Start(&htim5, TIM_CHANNEL_1);
 }
 
 void High::save_rc_control(){
@@ -366,16 +370,16 @@ void High::save_rc_control(){
 void High::save_control_send(){
     if (ONE_POSITION){
 
-        __HAL_TIM_SetCompare(&htim1, TIM_CHANNEL_1, 4000);
-		__HAL_TIM_SetCompare(&htim5, TIM_CHANNEL_1, 930);
+        __HAL_TIM_SetCompare(&htim1, TIM_CHANNEL_1, 3000);
+		__HAL_TIM_SetCompare(&htim1, TIM_CHANNEL_2, 2600);
 
     }else if (TWO_POSITION){
 
-        __HAL_TIM_SetCompare(&htim1, TIM_CHANNEL_1, 3000);
-		__HAL_TIM_SetCompare(&htim5, TIM_CHANNEL_1, 2600);
+        __HAL_TIM_SetCompare(&htim1, TIM_CHANNEL_1, 900);
+		__HAL_TIM_SetCompare(&htim1, TIM_CHANNEL_2, 1000);
 
     }else if (THREE_POSITION){
-        __HAL_TIM_SetCompare(&htim1, TIM_CHANNEL_1, 930);
-		__HAL_TIM_SetCompare(&htim5, TIM_CHANNEL_1, 1000);
+        __HAL_TIM_SetCompare(&htim1, TIM_CHANNEL_1, 3000);
+		__HAL_TIM_SetCompare(&htim1, TIM_CHANNEL_2, 2600);
     }
 }

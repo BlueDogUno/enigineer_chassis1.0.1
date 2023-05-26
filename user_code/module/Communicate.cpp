@@ -26,6 +26,8 @@ extern "C"
 #include "Referee.h"
 #include "Ui.h"
 
+#include "high.h"
+
 Remote_control remote_control;
 extern Can_receive can_receive;
 Referee referee;
@@ -58,26 +60,12 @@ void Communicate::run()
     ui.run();
 
     //向云台发送裁判数据
-    uint16_t temp_id1_42mm_cooling_limit, temp_id1_42mm_cooling_rate, temp_id1_42mm_cooling_heat;
-    uint8_t temp_color, temp_robot_id;
-    uint16_t temp_id1_42mm_speed_limit;
-    fp32 temp_bullet_speed;
-    uint8_t temp_chassis_behaviour_mode;
-    uint8_t temp_game_progress = referee.game_state.game_progress;
+    bool_t lift_state;
 
-    referee.get_shooter_id1_42mm_cooling_limit_and_heat(&temp_id1_42mm_cooling_limit, &temp_id1_42mm_cooling_heat);
-    referee.get_shooter_id1_42mm_cooling_rate(&temp_id1_42mm_cooling_rate);
-    referee.get_color(&temp_color);
-    referee.get_robot_id(&temp_robot_id);
-    referee.get_shooter_id1_42mm_speed_limit_and_bullet_speed(&temp_id1_42mm_speed_limit, &temp_bullet_speed);
-    temp_chassis_behaviour_mode = chassis.chassis_behaviour_mode;
+    lift_state = high.lift_state;
 
-    can_receive.send_cooling_and_id_board_com(temp_id1_42mm_cooling_limit, temp_id1_42mm_cooling_rate, temp_id1_42mm_cooling_heat,
-                                              temp_color, temp_robot_id);
-
-    can_receive.send_42mm_speed_and_mode_board_com(temp_id1_42mm_speed_limit, temp_bullet_speed, temp_chassis_behaviour_mode,temp_game_progress);
-
-    cap.cap_read_data(can_receive.cap_receive.input_vot, can_receive.cap_receive.cap_vot, can_receive.cap_receive.input_current, can_receive.cap_receive.target_power);
+    can_receive.send_lift_auto_state(lift_state);
+    
 // TODO _data这里最好使用指针赋值,减少计算量,后续需修改
 #if CHASSIS_REMOTE_OPEN
     remote_control.rc_ctrl.rc.ch[0] = can_receive.chassis_receive.ch_0;
@@ -85,6 +73,7 @@ void Communicate::run()
     remote_control.rc_ctrl.rc.ch[3] = can_receive.chassis_receive.ch_3;
     remote_control.rc_ctrl.key.v = can_receive.chassis_receive.v;
     remote_control.rc_ctrl.rc.s[1] = can_receive.chassis_receive.s1;
+    remote_control.rc_ctrl.rc.s[0] = can_receive.chassis_receive.s0;
 #else
     ;
 #endif
@@ -123,7 +112,7 @@ extern "C"
                 // detect_hook(CHASSIS_MOTIVE_BR_MOTOR_TOE);
                 break;
             case CAN_SUPER_CAP_ID:
-                can_receive.get_super_cap_data(rx_data);
+                // can_receive.get_super_cap_data(rx_data);
                 // detect_hook(CHASSIS_MOTIVE_BR_MOTOR_TOE);
                 break;
 
@@ -154,14 +143,13 @@ extern "C"
                 // detect_hook(BOARD_COM);
                 break;
 
-            case CAN_GIMBAL_BOARD_COM_ID:
-                can_receive.receive_gimbal_board_com(rx_data);
+            case CAN_SS_BOARD_COM_ID:
+                can_receive.receive_ss_board_com(rx_data);
                 // detect_hook(BOARD_COM);
                 break;
             case CAN_UI_COM_ID:
                 can_receive.receive_ui_board_com(rx_data);
                 break;
-
             default:
             {
                 break;

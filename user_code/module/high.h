@@ -136,6 +136,7 @@ public:
 
     M3508_motor high_motive_motor[2];
     int32_t moto_start_angle[2];
+    bool_t lift_state;
 
     uint8_t motor_status[2];
     

@@ -144,7 +144,6 @@ void Chassis::feedback_update()
 
     // TODO 还未完善
     //底盘相对于云台的角度,由云台发送过来 编码器中的角度
-    chassis_relative_angle = can_receive.chassis_receive.gimbal_yaw_angle;
 
     // //计算底盘姿态角度, 如果底盘上有陀螺仪请更改这部分代码
     // chassis_yaw = rad_format(*(chassis_INS_angle + INS_YAW_ADDRESS_OFFSET) - chassis_yaw_motor->relative_angle);
@@ -322,7 +321,6 @@ void Chassis::power_ctrl()
     if (robot_id == 0)
     {
         total_current_limit = NO_JUDGE_TOTAL_CURRENT_LIMIT;
-        can_receive.can_cmd_super_cap_power(4500);
     }
     else
     {
@@ -339,12 +337,6 @@ void Chassis::power_ctrl()
         }
 				
 			  if(top_switch ==true&&chassis_power_buffer > 10.0f){
-				can_receive.can_cmd_super_cap_power(5500);//uint16_t(chassis_power_limit) * 100);
-				}else if(top_switch ==false&&chassis_power_buffer > 10.0f){
-				can_receive.can_cmd_super_cap_power(5500);//(uint16_t(chassis_power_limit) * 100);
-				}else{
-					can_receive.can_cmd_super_cap_power(5500);//(uint16_t(chassis_power_limit) * 100);
-				}
 		 }
 		
 		//电流限幅 
@@ -418,6 +410,7 @@ void Chassis::power_ctrl()
         chassis_motive_motor[2].current_set *= current_scale;
         chassis_motive_motor[3].current_set *= current_scale;
     }
+	}
 }
 
 /**

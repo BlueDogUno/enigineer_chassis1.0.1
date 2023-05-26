@@ -44,9 +44,8 @@ typedef enum
 
   //板间通信ID
   CAN_RC_BOARM_COM_ID = 0x301,
-  CAN_GIMBAL_BOARD_COM_ID = 0x302,
-  CAN_COOLING_BOARM_COM_ID = 0x303,
-  CAN_42MM_SPEED_BOARD_COM_ID = 0x304,
+  CAN_SS_BOARD_COM_ID = 0x302,
+  CAN_SEND_LIFT_AUTO_COM_ID = 0x303,
   CAN_UI_COM_ID = 0x305,
 
   //超级电容接收ID
@@ -81,6 +80,8 @@ typedef struct
 //    fp32 target_power;
 //  } super_cap_measure_t;
 
+
+
 //底盘接收数据结构体
 typedef struct
 {
@@ -89,38 +90,25 @@ typedef struct
   int16_t ch_2;
   int16_t ch_3;
   uint16_t v;
-
-  //云台状态
+  uint8_t s0;
   uint8_t s1;
-  uint8_t gimbal_behaviour;
-  fp32 gimbal_yaw_angle;
 
   // UI状态
-  fp32 gimbal_pitch_angle;
-  bool_t auto_state;
-  bool_t aim_state;
-  bool_t fric_state;
+  bool_t stretch_state;
+  bool_t yaw_state;
+  bool_t roll_state;
+  bool_t flip_state; 
+
+  //自动抬升模式
+  uint8_t lift_auto_mode;
+
 } chassis_receive_t;
 
 //底盘发送数据结构体
 typedef struct
 {
-  //测试热量及ID
-  uint16_t id1_42mm_cooling_limit; // 42mm测速热量上限
-  uint16_t id1_42mm_cooling_rate;  // 42mm测速热量冷却
-  uint16_t id1_42mm_cooling_heat;  // 42mm测速实时热量
-  uint8_t color;                   //判断红蓝方
-  uint8_t robot_id;                //机器人编号
-
-  //测速速度及底盘模式
-  uint16_t id1_42mm_speed_limi; // 42mm测速射速上限
-  uint16_t bullet_speed;        // 42mm测速实时射速
-
-  uint8_t chassis_behaviour;
-
   uint8_t game_progress;
-
-} chassis_send_t;
+}chassis_send_t;
 
 typedef struct
 {
@@ -164,17 +152,12 @@ public:
   //板间通信函数
   void receive_rc_board_com(uint8_t data[8]);
 
-  void receive_gimbal_board_com(uint8_t data[8]);
-
   void receive_ui_board_com(uint8_t data[8]);
 
-  // 发送枪口热量及ID
-  void send_cooling_and_id_board_com(uint16_t id1_42mm_cooling_limit, uint16_t id1_42mm_cooling_rate, uint16_t id1_42mm_cooling_heat, uint8_t color, uint8_t robot_id);
-  //发送枪口速度及底盘模式
-  void send_42mm_speed_and_mode_board_com(uint16_t id1_42mm_speed_limi, uint16_t bullet_speed, uint8_t chassis_behaviour, uint8_t temp_game_progress);
+  void receive_ss_board_com(uint8_t data[8]);
 
-  //发送超级电容设定功率
-  void can_cmd_super_cap_power(uint16_t set_power);
+  void send_lift_auto_state(bool_t lift_state);
+
 
   // 获取超电输入电压、电容电压、输入电流、设定功率
   void get_super_cap_data(uint8_t data[8]);

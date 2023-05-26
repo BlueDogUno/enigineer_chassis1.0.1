@@ -122,11 +122,7 @@ int main(void)
   
   MX_USART1_UART_Init();
   MX_USART6_UART_Init();
-	HAL_TIM_Base_Start(&htim1);
-	HAL_TIM_Base_Start(&htim5);
-  HAL_TIM_PWM_Start(&htim1, TIM_CHANNEL_1);
-    HAL_TIM_PWM_Start(&htim1, TIM_CHANNEL_2);
-		HAL_TIM_PWM_Start(&htim5, TIM_CHANNEL_1);
+
   /* USER CODE BEGIN 2 */
 
   /* USER CODE END 2 */

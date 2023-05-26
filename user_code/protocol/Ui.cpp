@@ -100,8 +100,6 @@ void Ui::run()  //运行主函数
 
 void Ui::feedback_update(){
 /*-----------------------------------------数据处理----------------------------------------------*/	
-	 fric_switch = can_receive.chassis_receive.fric_state;//摩擦轮标识符
-	 auto_ready_switch = can_receive.chassis_receive.auto_state;//自瞄开启标识符
 //	 pitch_angle = can_receive.chassis_receive.gimbal_pitch_angle;//pitch轴角度获取
 	//小陀螺功能
 	   if (top_switch)
