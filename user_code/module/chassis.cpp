@@ -133,7 +133,7 @@ void Chassis::feedback_update()
     {
         //更新动力电机速度，加速度是速度的PID微分
         chassis_motive_motor[i].speed = CHASSIS_MOTOR_RPM_TO_VECTOR_SEN * chassis_motive_motor[i].motor_measure->speed_rpm;
-        chassis_motive_motor[i].accel = *chassis_motive_motor[i].speed_pid.data.error_delta * CHASSIS_CONTROL_FREQUENCE;
+        chassis_motive_motor[i].accel = chassis_motive_motor[i].speed_pid.data.error_delta * CHASSIS_CONTROL_FREQUENCE;
     }
 
     //更新底盘x, y, z速度值,右手坐标系
@@ -453,31 +453,31 @@ void Chassis::chassis_behaviour_mode_set()
     last_chassis_mode = chassis_mode;
 
     //遥控器设置模式
-    if (switch_is_up(chassis_RC->rc.s[CHASSIS_MODE_CHANNEL])) //右拨杆上 底盘行为 跟随云台
-    {
-        chassis_behaviour_mode = CHASSIS_NO_FOLLOW_YAW;
-    }
-    else if (switch_is_mid(chassis_RC->rc.s[CHASSIS_MODE_CHANNEL])) //右拨杆中 底盘行为 自主运动
-    {
-        chassis_behaviour_mode = CHASSIS_NO_FOLLOW_YAW;
-    }
-    else if (switch_is_down(chassis_RC->rc.s[CHASSIS_MODE_CHANNEL])) //右拨杆下 底盘行为 无力
+    if (switch_is_up(chassis_RC->rc.s[CHASSIS_MODE_CHANNEL]))//右拨杆上  底盘无力minepush
     {
         chassis_behaviour_mode = CHASSIS_ZERO_FORCE;
+    }
+    else if (switch_is_mid(chassis_RC->rc.s[CHASSIS_MODE_CHANNEL])) //右拨杆中  底盘无力minecatch
+    {
+        chassis_behaviour_mode = CHASSIS_ZERO_FORCE;
+    }
+    else if (switch_is_down(chassis_RC->rc.s[CHASSIS_MODE_CHANNEL])) //右拨杆下  底盘自主运动
+    {
+        chassis_behaviour_mode = CHASSIS_NO_FOLLOW_YAW;
     }
 
     //添加自己的逻辑判断进入新模式
 
     //根据行为模式选择一个底盘控制模式
-    if (chassis_behaviour_mode == CHASSIS_ZERO_FORCE) //右拨杆下 底盘控制 开环 直接将遥控器杆量转化为电流值 当前逻辑表现为无力
+    if (chassis_behaviour_mode == CHASSIS_ZERO_FORCE) //底盘控制 开环 直接将遥控器杆量转化为电流值 当前逻辑表现为无力
     {
         chassis_mode = CHASSIS_VECTOR_RAW;
     }
-    else if (chassis_behaviour_mode == CHASSIS_INFANTRY_FOLLOW_GIMBAL_YAW) //右拨杆上 底盘控制 闭环 跟随云台
+    else if (chassis_behaviour_mode == CHASSIS_INFANTRY_FOLLOW_GIMBAL_YAW) //底盘控制 闭环 跟随云台
     {
         chassis_mode = CHASSIS_VECTOR_FOLLOW_GIMBAL_YAW;
     }
-    else if (chassis_behaviour_mode == CHASSIS_NO_FOLLOW_YAW) //右拨杆中 底盘控制 闭环 自主运动
+    else if (chassis_behaviour_mode == CHASSIS_NO_FOLLOW_YAW) //底盘控制 闭环 自主运动
     {
         chassis_mode = CHASSIS_VECTOR_NO_FOLLOW_YAW;
     }

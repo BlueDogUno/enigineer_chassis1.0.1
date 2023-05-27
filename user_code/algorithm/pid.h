@@ -12,7 +12,6 @@ typedef enum
 
 typedef struct
 {
-    uint8_t mode;
     //PID 三参数
     fp32 Kp;
     fp32 Ki;
@@ -27,8 +26,7 @@ typedef struct
     fp32 error;
     fp32 last_error;
 
-    fp32 *error_delta; //微分项,速度环下为error之间的差值,角度环下为陀螺仪角速度值
-
+    fp32 error_delta; //微分项,速度环下为error之间的差值,角度环下为陀螺仪角速度值
     fp32 out;
     fp32 Pout;
     fp32 Iout;
@@ -42,7 +40,7 @@ public:
     uint8_t mode;
     pid_data_t data;
 
-    void init(pid_mode_e mode_, const fp32 *pid_parm, fp32 *ref_, fp32 *set_, fp32 *erro_delta_);
+    void init(pid_mode_e mode_, const fp32 *pid_parm, fp32 *ref_, fp32 *set_, fp32 erro_delta_);
 
     fp32 pid_calc(); 
 

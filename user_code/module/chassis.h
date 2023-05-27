@@ -97,9 +97,9 @@
 //单个底盘电机最大速度
 #define MAX_WHEEL_SPEED 4.0f //4
 //底盘运动过程最大前进速度
-#define NORMAL_MAX_CHASSIS_SPEED_X 2.0f //2.0
+#define NORMAL_MAX_CHASSIS_SPEED_X 4.0f //2.0
 //底盘运动过程最大平移速度
-#define NORMAL_MAX_CHASSIS_SPEED_Y 1.5f //1.5
+#define NORMAL_MAX_CHASSIS_SPEED_Y  3.0f //1.5
 //底盘运动过程最大旋转速度
 #define NORMAL_MAX_CHASSIS_SPEED_Z 8.0f
 
