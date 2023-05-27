@@ -66,6 +66,11 @@
 //遥控器输入死区，因为遥控器存在差异，摇杆在中间，其值不一定为零
 #define RC_DEADBAND 0
 
+#define left_rocker_right           (high_RC->rc.ch[2] > 0)
+#define left_rocker_left            (high_RC->rc.ch[2] < 0)
+#define left_rocker_mid             (high_RC->rc.ch[2] == 0)
+
+
 #define rc_deadband_limit(input, output, dealine)        \
     {                                                    \
         if ((input) > (dealine) || (input) < -(dealine)) \
@@ -180,14 +185,12 @@ extern High high;
 
 typedef enum{
     ZROE_FORCE=0,
-    ONE,
-    TWO,
-    THREE,
+    down,
+    back,
 }save_state;
 
 
-#define ONE_POSITION        (high.save_state == ONE)
-#define TWO_POSITION        (high.save_state == TWO)
-#define THREE_POSITION          (high.save_state == THREE)
+#define SAVE_DOWN        (high.save_state == down)
+#define SAVE_BACK        (high.save_state == back)
 
 #endif

@@ -79,6 +79,8 @@ void High::init()
     moto_start_angle[CAN_LIFT_R_MOTOR] = high_motive_motor[CAN_LIFT_R_MOTOR].total_angle;
     high_motive_motor[CAN_LIFT_R_MOTOR].max_angle = moto_start_angle[CAN_LIFT_R_MOTOR] - LIFT_LIMIT_ANGLE;
     high_motive_motor[CAN_LIFT_R_MOTOR].min_angle = moto_start_angle[CAN_LIFT_R_MOTOR] + LIFT_LIMIT_ANGLE;
+
+    high.save_state = back;
 }
 
 /**
@@ -354,32 +356,23 @@ void High::save_init(){
 void High::save_rc_control(){
     if (switch_is_up(high_RC->rc.s[1])){//左拨杆向上
 
-        high.save_state = ONE;
+        if (left_rocker_right){
+            high.save_state = down; 
+        }else if(left_rocker_left){
+            high.save_state = back;
+        }
 
-    }else if(switch_is_mid(high_RC->rc.s[1])){//左拨杆向中
-
-        high.save_state =  TWO;
-
-    }else if(switch_is_down(high_RC->rc.s[1])){//左拨杆向下
-
-        high.save_state  = THREE;
-        
     }
 }
 
 void High::save_control_send(){
-    if (ONE_POSITION){
+    if (SAVE_DOWN){
+        __HAL_TIM_SetCompare(&htim1, TIM_CHANNEL_1, 1820);
+		__HAL_TIM_SetCompare(&htim1, TIM_CHANNEL_2, 1180);
 
-        __HAL_TIM_SetCompare(&htim1, TIM_CHANNEL_1, 3000);
-		__HAL_TIM_SetCompare(&htim1, TIM_CHANNEL_2, 2600);
+    }else if (SAVE_BACK){
+        __HAL_TIM_SetCompare(&htim1, TIM_CHANNEL_1, 1000);
+		__HAL_TIM_SetCompare(&htim1, TIM_CHANNEL_2, 2000);
 
-    }else if (TWO_POSITION){
-
-        __HAL_TIM_SetCompare(&htim1, TIM_CHANNEL_1, 900);
-		__HAL_TIM_SetCompare(&htim1, TIM_CHANNEL_2, 1000);
-
-    }else if (THREE_POSITION){
-        __HAL_TIM_SetCompare(&htim1, TIM_CHANNEL_1, 3000);
-		__HAL_TIM_SetCompare(&htim1, TIM_CHANNEL_2, 2600);
     }
 }
