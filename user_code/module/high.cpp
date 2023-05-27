@@ -152,7 +152,7 @@ void High::behaviour_mode_set()
     }
 
     //键鼠控制
-    
+
 }
 
 
@@ -175,7 +175,7 @@ void High::set_control()
     {
         //同轴有一个是相反的
         high_motive_motor[CAN_LIFT_L_MOTOR].angle_set += vlift_set;
-        high_motive_motor[CAN_LIFT_R_MOTOR].angle_set = vlift_set;
+        high_motive_motor[CAN_LIFT_R_MOTOR].angle_set -= vlift_set;
     }
     // 做角度限幅
     for (int i = 0;i < 2;i++)
@@ -261,6 +261,10 @@ void High::solve()
  */
 void High::output()
 {
+     for (int i = 0; i < 2; i++)
+    {
+        high_motive_motor[i].current_give = (int16_t)high_motive_motor[i].current_set;
+    }
     if (high_behaviour_mode == HIGH_ZERO_FORCE)
     {
         for (int i = 0; i < 2; i++)
@@ -268,11 +272,7 @@ void High::output()
             high_motive_motor[i].current_give = 0.0f;
         }
     }
-    for (int i = 0; i < 2; i++)
-    {
-        high_motive_motor[i].current_give = (int16_t)high_motive_motor[i].current_set;
-    }
-    can_receive.can_cmd_chassis_high_motor(high_motive_motor[CAN_LIFT_L_MOTOR].current_give, high_motive_motor[CAN_LIFT_R_MOTOR].current_give);
+   n_receive.can_cmd_chassis_high_motor(high_motive_motor[CAN_LIFT_L_MOTOR].current_give, high_motive_motor[CAN_LIFT_R_MOTOR].current_give);
 }
 
 /**
