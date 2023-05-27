@@ -70,6 +70,10 @@
 #define left_rocker_left            (high_RC->rc.ch[2] < 0)
 #define left_rocker_mid             (high_RC->rc.ch[2] == 0)
 
+#define SaveDownPosition_L      1820
+#define SaveDownPosition_R      1180
+#define SaveBackPosition_L      1000
+#define SaveBackPosition_R      2000
 
 #define rc_deadband_limit(input, output, dealine)        \
     {                                                    \

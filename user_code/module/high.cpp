@@ -127,17 +127,17 @@ void High::behaviour_mode_set()
     last_high_mode = high_mode;
 
     //遥控器设置模式
-    if (switch_is_up(high_RC->rc.s[HIGH_MODE_CHANNEL])) //右拨杆上
-    {
-        high_behaviour_mode = HIGH_ZERO_FORCE;
-    }
-    else if (switch_is_mid(high_RC->rc.s[HIGH_MODE_CHANNEL])) //右拨杆中
+    if (switch_is_up(high_RC->rc.s[HIGH_MODE_CHANNEL])) //右拨杆上  minepush时可以抬升
     {
         high_behaviour_mode = HIGH_OPEN;
     }
+    else if (switch_is_mid(high_RC->rc.s[HIGH_MODE_CHANNEL])) //右拨杆中    minecatch时不能抬升
+    {
+        high_behaviour_mode = HIGH_ZERO_FORCE;
+    }
     else if (switch_is_down(high_RC->rc.s[HIGH_MODE_CHANNEL])) //右拨杆下
     {
-        high_behaviour_mode = HIGH_CLOSE;
+        high_behaviour_mode = HIGH_ZERO_FORCE;
     }
 
 
@@ -150,6 +150,9 @@ void High::behaviour_mode_set()
     {
         high_mode = HIGH_AUTO;
     }
+
+    //键鼠控制
+    
 }
 
 
@@ -172,7 +175,7 @@ void High::set_control()
     {
         //同轴有一个是相反的
         high_motive_motor[CAN_LIFT_L_MOTOR].angle_set += vlift_set;
-        high_motive_motor[CAN_LIFT_R_MOTOR].angle_set += -vlift_set;
+        high_motive_motor[CAN_LIFT_R_MOTOR].angle_set = vlift_set;
     }
     // 做角度限幅
     for (int i = 0;i < 2;i++)
@@ -243,29 +246,12 @@ void High::high_open_set_control(fp32 *vx_set)
  */
 void High::solve()
 {
-
-    // if (high_behaviour_mode == HIGH_OPEN)
-    // {
-    //     for (int i = 0; i < 2; i++)
-    //     {
-    //         high_motive_motor[i].speed_set = high_motive_motor[i].angle_pid.pid_calc();
-    //         if (high_motive_motor[i].speed_set > high_motive_motor[i].max_speed)
-    //             high_motive_motor[i].speed_set = high_motive_motor[i].max_speed;
-    //         if (high_motive_motor[i].speed_set < high_motive_motor[i].min_speed)
-    //             high_motive_motor[i].speed_set = high_motive_motor[i].min_speed;
-    //         high_motive_motor[i].current_give = high_motive_motor[i].speed_pid.pid_calc();
-    //     }
-    //     // raw控制直接返回
-    //     return;
-    // }
-    // else if (high_behaviour_mode == HIGH_CLOSE)
-    // {
+    if (high_behaviour_mode == HIGH_OPEN)
         for (int i = 0; i < 2; i++)
         {
             motor_set_control(&high_motive_motor[i]);
         }
         //TODO:其实这里需要把两个2006只用速度环，伸出电机继续使用双环
-    // }
 }
 
 /**
@@ -281,6 +267,10 @@ void High::output()
         {
             high_motive_motor[i].current_give = 0.0f;
         }
+    }
+    for (int i = 0; i < 2; i++)
+    {
+        high_motive_motor[i].current_give = (int16_t)high_motive_motor[i].current_set;
     }
     can_receive.can_cmd_chassis_high_motor(high_motive_motor[CAN_LIFT_L_MOTOR].current_give, high_motive_motor[CAN_LIFT_R_MOTOR].current_give);
 }
@@ -303,7 +293,7 @@ void High::motor_set_control(M3508_motor *motor)
         motor->speed_set = motor->max_speed;
     if (motor->speed_set < motor->min_speed)
         motor->speed_set = motor->min_speed;
-    motor->current_give = motor->speed_pid.pid_calc();
+    motor->current_set = motor->speed_pid.pid_calc();
     
 }
 
@@ -367,12 +357,12 @@ void High::save_rc_control(){
 
 void High::save_control_send(){
     if (SAVE_DOWN){
-        __HAL_TIM_SetCompare(&htim1, TIM_CHANNEL_1, 1820);
-		__HAL_TIM_SetCompare(&htim1, TIM_CHANNEL_2, 1180);
+        __HAL_TIM_SetCompare(&htim1, TIM_CHANNEL_1, SaveDownPosition_L);
+		__HAL_TIM_SetCompare(&htim1, TIM_CHANNEL_2, SaveDownPosition_R);
 
     }else if (SAVE_BACK){
-        __HAL_TIM_SetCompare(&htim1, TIM_CHANNEL_1, 1000);
-		__HAL_TIM_SetCompare(&htim1, TIM_CHANNEL_2, 2000);
+        __HAL_TIM_SetCompare(&htim1, TIM_CHANNEL_1, SaveBackPosition_L);
+		__HAL_TIM_SetCompare(&htim1, TIM_CHANNEL_2, SaveBackPosition_R);
 
     }
 }
