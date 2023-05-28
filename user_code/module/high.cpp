@@ -69,9 +69,10 @@ void High::init()
     }
     // 电机软件限位，需要测试后开启
     
-    
+    vTaskDelay(1000);
     //更新一下数据
     feedback_update();
+
     moto_start_angle[CAN_LIFT_L_MOTOR] = high_motive_motor[CAN_LIFT_L_MOTOR].total_angle;
     high_motive_motor[CAN_LIFT_L_MOTOR].max_angle = moto_start_angle[CAN_LIFT_L_MOTOR] + LIFT_LIMIT_ANGLE;
     high_motive_motor[CAN_LIFT_L_MOTOR].min_angle = moto_start_angle[CAN_LIFT_L_MOTOR] - LIFT_LIMIT_ANGLE;
@@ -97,7 +98,7 @@ void High::feedback_update(){
     {
         //更新动力电机速度
         high_motive_motor[i].speed = HIGH_MOTOR_RPM_TO_VECTOR_SEN * high_motive_motor[i].motor_measure->speed_rpm;
-        high_motive_motor[i].total_angle = high_motive_motor[i].motor_measure->total_angle;
+        high_motive_motor[i].total_angle = high_motive_motor[i].motor_measure->total_angle - moto_start_angle[i];
         high_motive_motor[i].angle_error = high_motive_motor[i].total_angle - high_motive_motor[i].angle_set;
         if (high_motive_motor[i].angle_error < ANGLE_ERR_TOLERANT &&  high_motive_motor[i].angle_error > -ANGLE_ERR_TOLERANT)
             motor_status[i] = READY;
@@ -272,7 +273,8 @@ void High::output()
             high_motive_motor[i].current_give = 0.0f;
         }
     }
-   n_receive.can_cmd_chassis_high_motor(high_motive_motor[CAN_LIFT_L_MOTOR].current_give, high_motive_motor[CAN_LIFT_R_MOTOR].current_give);
+    can_receive.can_cmd_chassis_high_motor(high_motive_motor[CAN_LIFT_L_MOTOR].current_give, high_motive_motor[CAN_LIFT_R_MOTOR].current_give);
+    // can_receive.can_cmd_chassis_high_motor(0, 0);
 }
 
 /**

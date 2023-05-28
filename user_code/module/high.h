@@ -24,29 +24,29 @@
 //前后的遥控器通道号码
 #define HIGH_X_CHANNEL 3
 
-#define HIGH_OPEN_RC_SCALE 1 // 遥控器乘以该比例发送到can上
+#define HIGH_OPEN_RC_SCALE 300.0f // 遥控器乘以该比例发送到can上
 
 //选择取矿机构状态 开关通道号
 #define HIGH_MODE_CHANNEL 1
 //选择取矿机构状态 开关通道号
 #define STRETCH_MODE_CHANNEL 0
 
-#define ANGLE_ERR_TOLERANT 2000
+#define ANGLE_ERR_TOLERANT 2.0f
 
 
 //拨矿电机速度环PID
-#define MOTIVE_MOTOR_SPEED_PID_KP 2000.0f
-#define MOTIVE_MOTOR_SPEED_PID_KI 0.0f
-#define MOTIVE_MOTOR_SPEED_PID_KD 1.0f
-#define MOTIVE_MOTOR_SPEED_PID_MAX_IOUT 200.0f
-#define MOTIVE_MOTOR_SPEED_PID_MAX_OUT 10000.0f
+#define MOTIVE_MOTOR_SPEED_PID_KP 1500.0f
+#define MOTIVE_MOTOR_SPEED_PID_KI 300.0f
+#define MOTIVE_MOTOR_SPEED_PID_KD 0.0f
+#define MOTIVE_MOTOR_SPEED_PID_MAX_IOUT 8000.0f
+#define MOTIVE_MOTOR_SPEED_PID_MAX_OUT 12000.0f
 
 //拨矿电机角度环PID
-#define MOTIVE_MOTOR_ANGLE_PID_KP 2000.0f 
+#define MOTIVE_MOTOR_ANGLE_PID_KP 1.0f 
 #define MOTIVE_MOTOR_ANGLE_PID_KI 0.0f
-#define MOTIVE_MOTOR_ANGLE_PID_KD 1.0f
+#define MOTIVE_MOTOR_ANGLE_PID_KD 0.0f
 #define MOTIVE_MOTOR_ANGLE_PID_MAX_IOUT 1.0f
-#define MOTIVE_MOTOR_ANGLE_PID_MAX_OUT 10000.0f
+#define MOTIVE_MOTOR_ANGLE_PID_MAX_OUT 100.0f
 
 //m3508转化成底盘速度(m/s)的比例，
 #define M3508_motor_RPM_TO_VECTOR 0.000415809748903494517209f
@@ -54,14 +54,14 @@
 #define HIGH_MOTOR_RPM_TO_VECTOR_SEN M3508_motor_RPM_TO_VECTOR
 
 // 各电机角度限幅
-#define LIFT_LIMIT_ANGLE 30000.0f
+#define LIFT_LIMIT_ANGLE 20.0f
 
 #define MOTOR_SPEED_TO_HIGH_SPEED 0.25f
 
 //拨矿过程最大速度
-#define NORMAL_MAX_HIGH_SPEED 8.0f //2.0
+#define NORMAL_MAX_HIGH_SPEED 2.0f //2.0
 //伸爪最大速度
-#define NORMAL_MAX_STRETCH_SPEED 4.0f //2.0
+#define NORMAL_MAX_STRETCH_SPEED 2.0f //2.0
 
 //遥控器输入死区，因为遥控器存在差异，摇杆在中间，其值不一定为零
 #define RC_DEADBAND 0
@@ -144,7 +144,7 @@ public:
     high_mode_e last_high_mode; //抓取机构上次控制状态机
 
     M3508_motor high_motive_motor[2];
-    int32_t moto_start_angle[2];
+    fp32 moto_start_angle[2];
     bool_t lift_state;
 
     uint8_t motor_status[2];

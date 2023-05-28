@@ -32,15 +32,15 @@ void Can_receive::get_high_motor_measure(uint8_t num, uint8_t data[8])
     chassis_high_motor[num].speed_rpm = (uint16_t)(data[2] << 8 | data[3]);
     chassis_high_motor[num].given_current = (uint16_t)(data[4] << 8 | data[5]);
     chassis_high_motor[num].temperate = data[6];
-    if(chassis_high_motor[num].ecd - chassis_high_motor[num].last_ecd > 5000)
+    if(chassis_high_motor[num].ecd - chassis_high_motor[num].last_ecd > 4096)
     {
         chassis_high_motor[num].round--;
     }
-    if(chassis_high_motor[num].ecd - chassis_high_motor[num].last_ecd < -5000)
+    if(chassis_high_motor[num].ecd - chassis_high_motor[num].last_ecd < -4096)
     {
         chassis_high_motor[num].round++;
     }
-    chassis_high_motor[num].total_angle = chassis_high_motor[num].round * 8192 + chassis_high_motor[num].ecd - chassis_high_motor[num].offset_angle;
+    chassis_high_motor[num].total_angle = (chassis_high_motor[num].round * 360.0f) / 19.0f + chassis_high_motor[num].ecd * 360.0f / 19.0f / 8192.0f;
     chassis_high_motor[num].angle_err = chassis_high_motor[num].last_total_angle - chassis_high_motor[num].total_angle;
 
 }
